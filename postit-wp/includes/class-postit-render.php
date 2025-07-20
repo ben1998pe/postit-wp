@@ -37,14 +37,8 @@ class PostIt_Render {
         // Obtener el contexto de la página actual
         $page_context = $this->get_current_page_context();
         
-        // Debug: Log del contexto actual
-        error_log('PostIt WP: Contexto actual: ' . $page_context);
-        
         // Obtener notas para este contexto
         $notes = $this->db->get_notes_by_context($page_context);
-        
-        // Debug: Log del número de notas encontradas
-        error_log('PostIt WP: Notas encontradas para contexto "' . $page_context . '": ' . count($notes));
         
         // Si no hay notas para el contexto exacto, intentar con contextos similares
         if (empty($notes)) {
@@ -54,22 +48,9 @@ class PostIt_Render {
             foreach ($alternative_contexts as $alt_context) {
                 $notes = $this->db->get_notes_by_context($alt_context);
                 if (!empty($notes)) {
-                    error_log('PostIt WP: Notas encontradas para contexto alternativo "' . $alt_context . '": ' . count($notes));
                     break;
                 }
             }
-        }
-        
-        // TEMPORAL: Si no hay notas, mostrar una nota de prueba
-        if (empty($notes)) {
-            error_log('PostIt WP: No se encontraron notas, mostrando nota de prueba');
-            $notes = array(array(
-                'id' => 999,
-                'note_text' => '🔧 NOTA DE PRUEBA: Contexto actual: ' . $page_context . ' - Si ves esta nota, el plugin está funcionando!',
-                'user_id' => 1,
-                'created_at' => current_time('mysql'),
-                'page_context' => $page_context
-            ));
         }
         
         // Renderizar las notas
@@ -84,9 +65,6 @@ class PostIt_Render {
     public function get_current_page_context() {
         // Obtener la URI actual
         $request_uri = $_SERVER['REQUEST_URI'];
-        
-        // Debug: Log de la URI original
-        error_log('PostIt WP: URI original: ' . $request_uri);
         
         // Limpiar la URI
         $clean_uri = esc_url_raw($request_uri);
@@ -106,9 +84,6 @@ class PostIt_Render {
         
         // Sanitizar el contexto
         $context = sanitize_text_field($path);
-        
-        // Debug: Log del contexto final
-        error_log('PostIt WP: Contexto final: ' . $context);
         
         return $context;
     }
@@ -147,9 +122,6 @@ class PostIt_Render {
         // Intentar con el path completo sin parámetros
         $alternatives[] = $base_path;
         
-        // Debug: Log de contextos alternativos
-        error_log('PostIt WP: Contextos alternativos para "' . $page_context . '": ' . implode(', ', $alternatives));
-        
         return array_unique($alternatives);
     }
     
@@ -166,9 +138,53 @@ class PostIt_Render {
             <?php endforeach; ?>
         </div>
         
-        <!-- Debug visual temporal -->
-        <div style="position: fixed; bottom: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 999999; font-size: 12px;">
-            🔧 DEBUG: PostIt WP está cargado. Notas: <?php echo count($notes); ?>
+        <!-- Botón flotante para crear nueva nota -->
+        <div id="postit-wp-add-button" class="postit-wp-add-button" title="<?php _e('Agregar Nueva Nota', 'postit-wp'); ?>">
+            <span class="dashicons dashicons-plus-alt2"></span>
+        </div>
+        
+        <!-- Modal para crear/editar notas -->
+        <div id="postit-wp-modal" class="postit-wp-modal">
+            <div class="postit-wp-modal-content">
+                <div class="postit-wp-modal-header">
+                    <h3 id="postit-wp-modal-title"><?php _e('Nueva Nota', 'postit-wp'); ?></h3>
+                    <span class="postit-wp-modal-close">&times;</span>
+                </div>
+                <form id="postit-wp-note-form">
+                    <input type="hidden" id="postit-wp-note-id" name="note_id" value="">
+                    <input type="hidden" id="postit-wp-note-context" name="page_context" value="<?php echo esc_attr($this->get_current_page_context()); ?>">
+                    
+                    <div class="postit-wp-form-field">
+                        <label for="postit-wp-note-text"><?php _e('Contenido de la Nota:', 'postit-wp'); ?></label>
+                        <textarea 
+                            id="postit-wp-note-text" 
+                            name="note_text" 
+                            rows="4" 
+                            required
+                            placeholder="<?php esc_attr_e('Escribe tu nota aquí...', 'postit-wp'); ?>"
+                        ></textarea>
+                    </div>
+                    
+                    <div class="postit-wp-form-field">
+                        <label for="postit-wp-note-context-display"><?php _e('Página donde aparecerá:', 'postit-wp'); ?></label>
+                        <input 
+                            type="text" 
+                            id="postit-wp-note-context-display" 
+                            value="<?php echo esc_attr($this->get_current_page_context()); ?>"
+                            readonly
+                        >
+                    </div>
+                    
+                    <div class="postit-wp-form-actions">
+                        <button type="submit" class="button button-primary">
+                            <?php _e('Guardar Nota', 'postit-wp'); ?>
+                        </button>
+                        <button type="button" class="button postit-wp-modal-cancel">
+                            <?php _e('Cancelar', 'postit-wp'); ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
         <?php
     }
@@ -199,6 +215,14 @@ class PostIt_Render {
             <div class="postit-note-header">
                 <span class="postit-author"><?php echo $author_name; ?></span>
                 <span class="postit-date"><?php echo $formatted_date; ?></span>
+                <div class="postit-note-actions">
+                    <button class="postit-edit-btn" title="<?php _e('Editar Nota', 'postit-wp'); ?>" data-note-id="<?php echo $note_id; ?>">
+                        <span class="dashicons dashicons-edit"></span>
+                    </button>
+                    <button class="postit-delete-btn" title="<?php _e('Eliminar Nota', 'postit-wp'); ?>" data-note-id="<?php echo $note_id; ?>">
+                        <span class="dashicons dashicons-trash"></span>
+                    </button>
+                </div>
             </div>
             <div class="postit-note-content">
                 <?php echo wp_kses_post(wpautop($note_text)); ?>

@@ -9,7 +9,7 @@
 .postit-wp-container {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 90px;
     z-index: 999999;
     max-width: 300px;
     max-height: 80vh;
@@ -27,7 +27,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     position: relative;
     pointer-events: auto;
-    transform: rotate(-1deg);
+    transform: rotate(0deg);
     transition: all 0.3s ease;
     font-family: 'Comic Sans MS', cursive, sans-serif;
     font-size: 14px;
@@ -38,7 +38,7 @@
 }
 
 .postit-note:hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     z-index: 1000000;
 }
@@ -153,7 +153,7 @@
 @media (max-width: 768px) {
     .postit-wp-container {
         bottom: 10px;
-        right: 10px;
+        right: 80px;
         max-width: 250px;
     }
     
@@ -162,12 +162,20 @@
         font-size: 13px;
         padding: 12px;
     }
+    
+    .postit-wp-add-button {
+        bottom: 10px;
+        right: 10px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
 }
 
 @media (max-width: 480px) {
     .postit-wp-container {
         bottom: 5px;
-        right: 5px;
+        right: 70px;
         max-width: 200px;
     }
     
@@ -181,6 +189,14 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
+    }
+    
+    .postit-wp-add-button {
+        bottom: 5px;
+        right: 5px;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
     }
 }
 
@@ -205,42 +221,42 @@
     display: none;
 }
 
-/* Estilos para múltiples notas (apilamiento) */
+/* Estilos para múltiples notas (alineadas) */
 .postit-wp-container .postit-note:nth-child(2) {
-    transform: rotate(1deg);
-    margin-left: 10px;
+    transform: rotate(0deg);
+    margin-left: 0px;
 }
 
 .postit-wp-container .postit-note:nth-child(3) {
-    transform: rotate(-2deg);
-    margin-left: 5px;
+    transform: rotate(0deg);
+    margin-left: 0px;
 }
 
 .postit-wp-container .postit-note:nth-child(4) {
-    transform: rotate(2deg);
-    margin-left: 15px;
+    transform: rotate(0deg);
+    margin-left: 0px;
 }
 
 .postit-wp-container .postit-note:nth-child(5) {
-    transform: rotate(-1deg);
-    margin-left: 8px;
+    transform: rotate(0deg);
+    margin-left: 0px;
 }
 
 /* Hover effects para múltiples notas */
 .postit-wp-container .postit-note:nth-child(2):hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: scale(1.02);
 }
 
 .postit-wp-container .postit-note:nth-child(3):hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: scale(1.02);
 }
 
 .postit-wp-container .postit-note:nth-child(4):hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: scale(1.02);
 }
 
 .postit-wp-container .postit-note:nth-child(5):hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: scale(1.02);
 }
 
 /* Scrollbar personalizado para el contenedor */
@@ -329,4 +345,259 @@
     border-top-color: #333;
     z-index: 1000001;
     pointer-events: none;
+}
+
+/* Botón flotante para agregar notas */
+.postit-wp-add-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: #0073aa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 115, 170, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000001;
+    color: white;
+    font-size: 24px;
+}
+
+.postit-wp-add-button:hover {
+    background: #005a87;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 115, 170, 0.4);
+}
+
+.postit-wp-add-button .dashicons {
+    color: white;
+}
+
+/* Modal para crear/editar notas */
+.postit-wp-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.postit-wp-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.postit-wp-modal-header {
+    background: #0073aa;
+    color: white;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.postit-wp-modal-header h3 {
+    margin: 0;
+    color: white;
+}
+
+.postit-wp-modal-close {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.postit-wp-modal-close:hover {
+    opacity: 0.7;
+}
+
+.postit-wp-modal form {
+    padding: 20px;
+}
+
+.postit-wp-form-field {
+    margin-bottom: 20px;
+}
+
+.postit-wp-form-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.postit-wp-form-field textarea,
+.postit-wp-form-field input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.postit-wp-form-field textarea:focus,
+.postit-wp-form-field input[type="text"]:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
+}
+
+.postit-wp-form-field input[readonly] {
+    background-color: #f9f9f9;
+    color: #666;
+}
+
+.postit-wp-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.postit-wp-form-actions .button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.postit-wp-form-actions .button-primary {
+    background: #0073aa;
+    color: white;
+}
+
+.postit-wp-form-actions .button-primary:hover {
+    background: #005a87;
+}
+
+.postit-wp-form-actions .button:not(.button-primary) {
+    background: #f1f1f1;
+    color: #333;
+}
+
+.postit-wp-form-actions .button:not(.button-primary):hover {
+    background: #e1e1e1;
+}
+
+/* Botones de acción en las notas */
+.postit-note-actions {
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.postit-note:hover .postit-note-actions {
+    opacity: 1;
+}
+
+.postit-edit-btn,
+.postit-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    color: #856404;
+}
+
+.postit-edit-btn:hover {
+    background: rgba(0, 115, 170, 0.1);
+    color: #0073aa;
+}
+
+.postit-delete-btn:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.postit-edit-btn .dashicons,
+.postit-delete-btn .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Responsive para el modal */
+@media (max-width: 768px) {
+    .postit-wp-modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .postit-wp-form-actions {
+        flex-direction: column;
+    }
+    
+    .postit-wp-form-actions .button {
+        width: 100%;
+    }
+}
+
+/* Notificaciones */
+.postit-wp-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000003;
+    animation: notificationSlideIn 0.3s ease-out;
+}
+
+@keyframes notificationSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.postit-wp-notification.success {
+    background: #28a745;
+}
+
+.postit-wp-notification.error {
+    background: #dc3545;
+}
+
+.postit-wp-notification.info {
+    background: #17a2b8;
 } 

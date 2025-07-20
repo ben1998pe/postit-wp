@@ -64,6 +64,7 @@ class PostIt_WP {
         // Cargar clases principales
         require_once POSTIT_WP_PLUGIN_DIR . 'includes/class-postit-db.php';
         require_once POSTIT_WP_PLUGIN_DIR . 'includes/class-postit-render.php';
+        require_once POSTIT_WP_PLUGIN_DIR . 'includes/class-postit-ajax.php';
         
         // Cargar archivo de administración
         if (is_admin()) {
@@ -88,6 +89,9 @@ class PostIt_WP {
         
         // Renderizar notas en el admin
         add_action('admin_footer', array($this, 'render_admin_notes'));
+        
+        // Inicializar AJAX
+        new PostIt_Ajax();
     }
     
     /**
@@ -101,8 +105,7 @@ class PostIt_WP {
         // Insertar datos de prueba
         $this->insert_sample_data();
         
-        // Debug: Log de activación
-        error_log('PostIt WP: Plugin activado y datos de prueba insertados');
+
         
         // Flush rewrite rules
         flush_rewrite_rules();
@@ -143,6 +146,13 @@ class PostIt_WP {
             true
         );
         wp_enqueue_script('postit-wp-admin');
+        
+        // Localizar script con variables AJAX
+        wp_localize_script('postit-wp-admin', 'postitWpAjax', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('postit_wp_nonce'),
+            'isAdmin' => current_user_can('manage_options')
+        ));
     }
     
     /**
@@ -159,8 +169,7 @@ class PostIt_WP {
             30
         );
         
-        // Debug: Agregar log para verificar que el menú se está agregando
-        error_log('PostIt WP: Menú de administración agregado');
+
     }
     
     /**
@@ -218,12 +227,7 @@ class PostIt_WP {
                 'page_context' => '/wp-admin/post-new.php',
                 'user_id' => 1
             ),
-            // Nota de prueba que aparece en todas las páginas
-            array(
-                'note_text' => '🔧 NOTA DE PRUEBA: Si ves esta nota, el plugin está funcionando correctamente!',
-                'page_context' => '/wp-admin/',
-                'user_id' => 1
-            )
+
         );
         
         // Insertar notas de prueba
